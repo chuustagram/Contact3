@@ -42,11 +42,20 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener{
                 _,destination,_->
-            if(destination.id==R.id.nav_settings || destination.id == R.id.nav_second)
+            if(destination.id==R.id.nav_settings)
             {
                 binding.fab.visibility = View.INVISIBLE
-            }else{
+                title = getString(R.string.action_settings)
+            } else if (destination.id == R.id.nav_second) {
+                if (contactViewModel.selectedIndex == -1) {// Add Mode
+                    title = getString(R.string.add)
+                } else { // Edit Mode
+                    title = getString(R.string.edit)
+                }
+            }
+            else{
                 binding.fab.visibility = View.VISIBLE
+                title = getString(R.string.app_name)
             }
         }
 

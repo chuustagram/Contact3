@@ -62,8 +62,8 @@ class FirstFragment : Fragment(), MenuProvider, RecordClickListener {
                         getString(R.string.no_record)
                 }else{
                     binding.textViewCount.isVisible = false
-                    adapter.setContact(it)
                 }
+                adapter.setContact(it)
             }
         )
         binding.recyclerView.adapter = adapter

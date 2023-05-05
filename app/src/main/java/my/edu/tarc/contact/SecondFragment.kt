@@ -1,5 +1,7 @@
 package my.edu.tarc.contact
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -75,7 +77,8 @@ class SecondFragment : Fragment(), MenuProvider {
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menu.clear()
         menuInflater.inflate(R.menu.second_menu, menu)
-//        menu.findItem(R.id.action_settings).isVisible = false
+        if (myContactViewModel.selectedIndex == -1)
+            menu.findItem(R.id.action_delete).isVisible = false
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -85,9 +88,34 @@ class SecondFragment : Fragment(), MenuProvider {
                 val name = editTextName.text.toString()
                 val phone = editTextPhone.text.toString()
                 val newContact = Contact(name, phone)
-                myContactViewModel.addContact(newContact)
+                if (myContactViewModel.selectedIndex == -1) { // Add Mode
+                    myContactViewModel.addContact(newContact)
+                } else { // Edit Mode
+                    myContactViewModel.updateContact(newContact)
+                }
             }
             Toast.makeText(context, getString(R.string.contact_saved), Toast.LENGTH_SHORT).show()
+        } else if (menuItem.itemId == R.id.action_delete) {
+            val deleteDialog = AlertDialog.Builder(requireActivity())
+
+            with(deleteDialog) {
+                setMessage(getString(R.string.delete_message))
+                setPositiveButton(
+                    getString(R.string.delete),
+                    { _, _ -> // Dialog Listener
+                        val contact = myContactViewModel.contactList.value!!.get(myContactViewModel.selectedIndex)
+                        myContactViewModel.deleteContact(contact)
+                        findNavController().navigateUp()
+                    }
+                )
+                setNegativeButton(
+                    getString(android.R.string.cancel),
+                    { _, _ -> // Dialog Listener
+                        // Do nothing
+                    }
+                )
+                create().show()
+            }
         } else if (menuItem.itemId == android.R.id.home) {
             findNavController().navigateUp()
         }
