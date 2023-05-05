@@ -26,7 +26,7 @@ class SecondFragment : Fragment(), MenuProvider {
     private val binding get() = _binding!!
 
     //Refer to the View Model created by the Main Activity
-    val myContactViewModel : ContactViewModel by activityViewModels()
+    val myContactViewModel: ContactViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,8 +37,10 @@ class SecondFragment : Fragment(), MenuProvider {
 
         //Let ProfileFragment to manage the Menu
         val menuHost: MenuHost = this.requireActivity()
-        menuHost.addMenuProvider(this, viewLifecycleOwner,
-            Lifecycle.State.RESUMED)
+        menuHost.addMenuProvider(
+            this, viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
 
         return binding.root
 
@@ -46,21 +48,38 @@ class SecondFragment : Fragment(), MenuProvider {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (myContactViewModel.selectedIndex != -1) { // Edit Mode
+            binding.editTextName.setText(
+                myContactViewModel.contactList.value!!.get(
+                    myContactViewModel.selectedIndex
+                ).name
+            )
+            binding.editTextPhone.setText(
+                myContactViewModel.contactList.value!!.get(
+                    myContactViewModel.selectedIndex
+                ).phone
+            )
+
+            binding.editTextName.requestFocus()
+            binding.editTextPhone.isEnabled = false
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        myContactViewModel.selectedIndex = -1
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-        menu.claer()
+        menu.clear()
         menuInflater.inflate(R.menu.second_menu, menu)
 //        menu.findItem(R.id.action_settings).isVisible = false
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-        if(menuItem.itemId == R.id.action_save){
+        if (menuItem.itemId == R.id.action_save) {
             //TODO: Insert a new contact to the DB
             binding.apply {
                 val name = editTextName.text.toString()
@@ -69,7 +88,7 @@ class SecondFragment : Fragment(), MenuProvider {
                 myContactViewModel.addContact(newContact)
             }
             Toast.makeText(context, getString(R.string.contact_saved), Toast.LENGTH_SHORT).show()
-        }else if(menuItem.itemId == android.R.id.home){
+        } else if (menuItem.itemId == android.R.id.home) {
             findNavController().navigateUp()
         }
         return true

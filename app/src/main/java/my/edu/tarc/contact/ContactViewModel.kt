@@ -11,6 +11,8 @@ class ContactViewModel (application: Application): AndroidViewModel(application)
     var contactList : LiveData<List<Contact>>
     private val repository: ContactRepository
 
+    var selectedIndex: Int = -1
+
     init {
         val contactDao = ContactDatabase.getDatabase(application).contactDao()
         repository = ContactRepository(contactDao)
